@@ -10,7 +10,7 @@
   "author": "Ray",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^24.3.0"
+    "electron": "^24.8.8"
   },
   "dependencies": {
     "sqlite3": "^5.1.6"

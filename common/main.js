@@ -4,14 +4,7 @@ const fs = require('fs');
 const child = require('child_process').execFile;
 const childShell = require('child_process').exec;
 const childExecSync = require("child_process").execSync;
-var sqlite3;
-if (process.platform == 'linux') {
-  sqlite3 = require('../../FileSearcherV4_l64/node_modules/sqlite3').verbose();
-} else if (process.platform == 'win32') {
-  sqlite3 = require('../../FileSearcherV4_W64/node_modules/sqlite3').verbose();
-} else if (process.platform == 'darwin') {
-  sqlite3 = null;
-}
+const sqlite3 = require(`../${process.platform}/node_modules/sqlite3`).verbose();
 
 //const { Log } = require("./SupportClasses.js");
 
