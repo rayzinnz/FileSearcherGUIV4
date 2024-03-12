@@ -1,0 +1,38 @@
+html *
+{
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	font-size: x-small;
+}
+
+table, th, td {
+	border: 1px solid;
+	border-collapse: collapse;
+	padding: 3px;
+	cursor: pointer;
+	max-height: 1em;
+	white-space: nowrap;
+}
+
+label {
+	white-space: pre;
+}
+
+input {
+	width: -webkit-fill-available;
+	flex-grow:1;
+}
+
+.input_label {
+	width: 60px;
+}
+
+.input_collection {
+	justify-content: space-between;
+	display: flex;
+}
+
+.selected {
+    background-color: brown;
+    color: #FFF;
+}
+
