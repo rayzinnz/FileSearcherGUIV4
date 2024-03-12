@@ -4,7 +4,8 @@ const fs = require('fs');
 const child = require('child_process').execFile;
 const childShell = require('child_process').exec;
 const childExecSync = require("child_process").execSync;
-const sqlite3 = require(`../${process.platform}/node_modules/sqlite3`).verbose();
+const sqlite3 = require(`sqlite3`).verbose();
+// const sqlite3 = require(`../${process.platform}/node_modules/sqlite3`).verbose();
 
 //const { Log } = require("./SupportClasses.js");
 
