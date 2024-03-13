@@ -13,6 +13,6 @@
     "electron": "^24.8.8"
   },
   "dependencies": {
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.7"
   }
 }
