@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="256"
+   height="256"
+   viewBox="0 0 67.733332 67.733335"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="appicon.svg">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4576">
+      <stop
+         style="stop-color:#008000;stop-opacity:1;"
+         offset="0"
+         id="stop4572" />
+      <stop
+         style="stop-color:#00d500;stop-opacity:1"
+         offset="1"
+         id="stop4574" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4576"
+       id="linearGradient4578"
+       x1="34.169922"
+       y1="117.35061"
+       x2="116.46159"
+       y2="117.35061"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter4640"
+       x="-0.093576773"
+       width="1.1871535"
+       y="-0.13079556"
+       height="1.2615911">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.2085787"
+         id="feGaussianBlur4642" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="86.463372"
+     inkscape:cy="156.68894"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1129"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-229.26665)">
+    <g
+       id="g4652">
+      <flowRoot
+         transform="matrix(0.54389689,0,0,0.48929401,-6.7377926,203.36444)"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;line-height:1.25;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4640)"
+         id="flowRoot3699"
+         xml:space="preserve"><flowRegion
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, '"
+           id="flowRegion3701"><rect
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, '"
+             y="66.596397"
+             x="29.294424"
+             height="121.72338"
+             width="207.58635"
+             id="rect3703" /></flowRegion><flowPara
+           id="flowPara3705">FS</flowPara></flowRoot>      <flowRoot
+         transform="matrix(0.54389689,0,0,0.48929401,-7.1544105,202.5642)"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;line-height:1.25;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, ';letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient4578);fill-opacity:1;stroke:none"
+         id="flowRoot3699-2"
+         xml:space="preserve"><flowRegion
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, ';fill:url(#linearGradient4578);fill-opacity:1"
+           id="flowRegion3701-4"><rect
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.33333588px;font-family:'Britannic Bold';-inkscape-font-specification:'Britannic Bold, ';fill:url(#linearGradient4578);fill-opacity:1"
+             y="66.596397"
+             x="29.294424"
+             height="121.72338"
+             width="207.58635"
+             id="rect3703-9" /></flowRegion><flowPara
+           style="fill-opacity:1;fill:url(#linearGradient4578)"
+           id="flowPara3705-7">FS</flowPara></flowRoot>    </g>
+  </g>
+</svg>

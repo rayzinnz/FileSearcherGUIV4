@@ -17,7 +17,7 @@ console.log(process.platform);
 if (process.platform == 'linux') {
   db_files = ["/home/ray/FileSearcherV3.db",];
 } else if (process.platform == 'win32') {
-  db_files = ["C:\\Users\\hrag\\dbs\\FileSearcherV3.db","C:\\Users\\hrag\\dbs\\FileSearcherV302.db",];
+  db_files = ["C:\\Users\\hrag\\dbs\\FileSearcherV3.db","C:\\Users\\hrag\\dbs\\FileSearcherV3_Sync.db","C:\\Users\\hrag\\dbs\\FileSearcherV302.db",];
 } else if (process.platform == 'darwin') {
   db_files = null;
 }
@@ -89,84 +89,122 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
 		return;
   }
 
-  let sql_attach = ''
-  let sql = ``
-  
-  if (contents_filter=='') {
-  sql = `
-  select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,NULL as snip
-  from fsearch fs
-  join f on f.rid=fs.frid
-  join fld on fld.rowid=f.fld_rowid
-  where 1=1
-  `
-  } else if (contents_filter.slice(0,3)=='...') {
-  // full FTS5 syntax per https://www.sqlite.org/fts5.html
-  console.log("full FTS5 syntax per https://www.sqlite.org/fts5.html")
-  sql = `
-  select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
-  from fi
-  join f on f.rid=fi.ROWID
-  join fsearch fs on fs.frid=f.rid
-  join fld on fld.rowid=f.fld_rowid
-  where fi MATCH 'contents:${contents_filter.slice(3)}'
-  `
-  } else {
-  sql = `
-  select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
-  from fi
-  join f on f.rid=fi.ROWID
-  join fsearch fs on fs.frid=f.rid
-  join fld on fld.rowid=f.fld_rowid
-  where fi MATCH 'contents:("${contents_filter}")'
-  `
-  }
-  sql += filename_filter_format(filename_filter);
-	sql += path_filter_format(path_filter);
+  let sql_attach = '';
+  let sqlInsertTemp = ``;
+  let sql = ``;
 
-  for (let iad=1; iad < db_files.length; iad++) {
+  if (contents_filter!='') {
+    sqlInsertTemp = 'INSERT INTO idtmp (sourceDb, rid, modified_localtime)\n'
+  }
+
+  // if (contents_filter=='') {
+  // sql = `
+  // select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,NULL as snip
+  // from fsearch fs
+  // join f on f.rid=fs.frid
+  // join fld on fld.rowid=f.fld_rowid
+  // where 1=1
+  // `
+  // } else if (contents_filter.slice(0,3)=='...') {
+  // // full FTS5 syntax per https://www.sqlite.org/fts5.html
+  // console.log("full FTS5 syntax per https://www.sqlite.org/fts5.html")
+  // sql = `
+  // select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+  // from fi
+  // join f on f.rid=fi.ROWID
+  // join fsearch fs on fs.frid=f.rid
+  // join fld on fld.rowid=f.fld_rowid
+  // where fi MATCH 'contents:${contents_filter.slice(3)}'
+  // `
+  // } else {
+  // sql = `
+  // select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+  // from fi
+  // join f on f.rid=fi.ROWID
+  // join fsearch fs on fs.frid=f.rid
+  // join fld on fld.rowid=f.fld_rowid
+  // where fi MATCH 'contents:("${contents_filter}")'
+  // `
+  // }
+  // sql += filename_filter_format(filename_filter);
+	// sql += path_filter_format(path_filter);
+
+  for (let iad=0; iad < db_files.length; iad++) {
     let attached_db = db_files[iad]
     console.log(attached_db);
-		let attached_db_fn = path.basename(attached_db)
+		let attached_db_fn = '';
+    if (iad>0) {
+      attached_db_fn = `[${path.basename(attached_db)}].`
+      sql+="UNION\n"
+      if (contents_filter!='') {
+        sqlInsertTemp+="UNION\n"
+      }
+    }
     console.log(attached_db_fn);
-
-    sql+="UNION\n"
     if (contents_filter=='') {
       sql += `
       select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,NULL as snip
-      from [${attached_db_fn}].fsearch fs
-      join [${attached_db_fn}].f on f.rid=fs.frid
-      join [${attached_db_fn}].fld on fld.rowid=f.fld_rowid
+      from ${attached_db_fn}fsearch fs
+      join ${attached_db_fn}f on f.rid=fs.frid
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
       where 1=1
       `
-      } else if (contents_filter.slice(0,3)=='...') {
+    } else if (contents_filter.slice(0,3)=='...') {
       // full FTS5 syntax per https://www.sqlite.org/fts5.html
       console.log("full FTS5 syntax per https://www.sqlite.org/fts5.html")
-      sql += `
-      select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
-      from [${attached_db_fn}].fi
-      join [${attached_db_fn}].f on f.rid=fi.ROWID
-      join [${attached_db_fn}].fsearch fs on fs.frid=f.rid
-      join [${attached_db_fn}].fld on fld.rowid=f.fld_rowid
+      sqlInsertTemp += `
+      SELECT '${attached_db_fn}', f.rid,fs.modified_localtime
+      from ${attached_db_fn}fi
+      join ${attached_db_fn}f on f.rid=fi.ROWID
+      join ${attached_db_fn}fsearch fs on fs.frid=f.rid
       where fi MATCH 'contents:${contents_filter.slice(3)}'
       `
-      } else {
       sql += `
-      select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
-      from [${attached_db_fn}].fi
-      join [${attached_db_fn}].f on f.rid=fi.ROWID
-      join [${attached_db_fn}].fsearch fs on fs.frid=f.rid
-      join [${attached_db_fn}].fld on fld.rowid=f.fld_rowid
+      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+      from idtmp
+      join ${attached_db_fn}fi on fi.ROWID=idtmp.rid
+      join ${attached_db_fn}f on f.rid=fi.ROWID
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
+      where fi MATCH 'contents:${contents_filter.slice(3)}'
+      and idtmp.sourceDb='${attached_db_fn}'
+      `
+    } else {
+      sqlInsertTemp += `
+      SELECT '${attached_db_fn}', f.rid,fs.modified_localtime
+      from ${attached_db_fn}fi
+      join ${attached_db_fn}f on f.rid=fi.ROWID
+      join ${attached_db_fn}fsearch fs on fs.frid=f.rid
       where fi MATCH 'contents:("${contents_filter}")'
       `
-      }
+      sql += `
+      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+      from idtmp
+      join ${attached_db_fn}fi on fi.ROWID=idtmp.rid
+      join ${attached_db_fn}f on f.rid=fi.ROWID
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
+      where fi MATCH 'contents:("${contents_filter}")'
+      and idtmp.sourceDb='${attached_db_fn}'
+      `
+    }
+    if (contents_filter=='') {
       sql += filename_filter_format(filename_filter);
       sql += path_filter_format(path_filter);
+    } else {
+      sqlInsertTemp += filename_filter_format(filename_filter);
+      sqlInsertTemp += path_filter_format(path_filter);
+    }
   }  
 
-  sql+="order by fs.modified_localtime desc\n"
-	sql+=`limit ${row_limit}\n`
+  if (contents_filter=='') {
+    sql+="order by fs.modified_localtime desc\n"
+    sql+=`limit ${row_limit}\n`
+  } else {
+    sqlInsertTemp+="order by fs.modified_localtime desc\n"
+    sqlInsertTemp+=`limit ${row_limit}\n`
+    sql+="order by idtmp.modified_localtime desc\n"
+  }
 
+  console.log(sqlInsertTemp);
   console.log(sql);
 
   let db_file = db_files[0];
@@ -179,17 +217,21 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
     //console.log('Connected to SQlite database.');
   });
 
-  for (let iad=1; iad < db_files.length; iad++) {
-    let attached_db = db_files[iad]
-		let attached_db_fn = path.basename(attached_db)
-		let sql_attach = "ATTACH DATABASE '" + attached_db.replace('\\','\\\\') + "' AS [" + attached_db_fn + "]"
-    console.log(sql_attach);
-    db.serialize(() => {
-      db.run(sql_attach)
-    });
-  }  
   
   db.serialize(() => {
+    for (let iad=1; iad < db_files.length; iad++) {
+      let attached_db = db_files[iad];
+      let attached_db_fn = path.basename(attached_db);
+      let sql_attach = "ATTACH DATABASE '" + attached_db.replace('\\','\\\\') + "' AS [" + attached_db_fn + "]";
+      console.log(sql_attach);
+      db.run(sql_attach);
+    }
+    if (sqlInsertTemp!='') {
+      db.run(`CREATE TEMP TABLE IF NOT EXISTS idtmp (sourceDb TEXT, rid INT, modified_localtime INT);`);
+      db.run(`DELETE FROM idtmp;`);
+      db.run(sqlInsertTemp);
+    }
+  
     db.all(sql, (err, ldt) => {
       if (err) {
         console.error(err.message);
