@@ -21,10 +21,20 @@ if (process.platform == 'linux') {
 } else if (process.platform == 'darwin') {
   db_files = null;
 }
-console.log(db_files);
+// console.log(db_files);
 //console.log(__dirname)
 dragIcon =  path.join('.', 'images', 'drag-and-drop.png')
 console.log(dragIcon)
+
+//remove any db files that do not exist
+// console.log(`len db_files: ${db_files.length}`);
+for (let iad=db_files.length-1; iad>=0; iad--) {
+  if (!fs.existsSync(db_files[iad])) {
+    console.log(`file not found, exclude: ${db_files[iad]}`);
+    db_files.splice(iad,1);
+  }
+}
+console.log(db_files);
 
 // function pingReturn() {
 //   return 'pong2';
