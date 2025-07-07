@@ -26,7 +26,8 @@
 		},
 		"args": [".", "--remote-debugging-port=9222"],
 		"outputCapture": "std",
-		"console": "integratedTerminal"
+		"console": "integratedTerminal",
+		"runtimeVersion": "22.16.0"
 	  }
 	]
   }
