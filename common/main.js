@@ -17,7 +17,18 @@ console.log(process.platform);
 if (process.platform == 'linux') {
   db_files = ["/home/ray/FileSearcherV3.db",];
 } else if (process.platform == 'win32') {
-  db_files = ["C:\\Users\\hrag\\dbs\\FileSearcherV3.db","C:\\Users\\hrag\\dbs\\FileSearcherV3_Sync.db","C:\\Users\\hrag\\dbs\\FileSearcherV302.db",];
+  db_files = [
+    "C:\\Users\\hrag\\dbs\\FileSearcherV3.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV3_Sync.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202505.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202506.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202507.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202508.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202509.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202510.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202511.db",
+    "C:\\Users\\hrag\\dbs\\FileSearcherV302_202512.db",
+  ];
 } else if (process.platform == 'darwin') {
   db_files = null;
 }
@@ -121,10 +132,10 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
     console.log(attached_db_fn);
     if (contents_filter=='') {
       sql += `
-      select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,NULL as snip
+      select f.filename,fs.modified_localtime as modified,size,f.path,f.archive_path,fld.name,fld.path AS fld_path,NULL as snip
       from ${attached_db_fn}fsearch fs
       join ${attached_db_fn}f on f.rid=fs.frid
-      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rid
       where 1=1
       `
     } else if (contents_filter.slice(0,3)=='...') {
@@ -138,11 +149,11 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
       where fi MATCH 'contents:${contents_filter.slice(3)}'
       `
       sql += `
-      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,fld.path AS fld_path,snippet(fi,0,'[',']','...',7) as snip
       from idtmp
       join ${attached_db_fn}fi on fi.ROWID=idtmp.rid
       join ${attached_db_fn}f on f.rid=fi.ROWID
-      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rid
       where fi MATCH 'contents:${contents_filter.slice(3)}'
       and idtmp.sourceDb='${attached_db_fn}'
       `
@@ -155,11 +166,11 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
       where fi MATCH 'contents:("${contents_filter}")'
       `
       sql += `
-      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,snippet(fi,0,'[',']','...',7) as snip
+      select f.filename,idtmp.modified_localtime as modified,size,f.path,f.archive_path,fld.name,fld.path AS fld_path,snippet(fi,0,'[',']','...',7) as snip
       from idtmp
       join ${attached_db_fn}fi on fi.ROWID=idtmp.rid
       join ${attached_db_fn}f on f.rid=fi.ROWID
-      join ${attached_db_fn}fld on fld.rowid=f.fld_rowid
+      join ${attached_db_fn}fld on fld.rowid=f.fld_rid
       where fi MATCH 'contents:("${contents_filter}")'
       and idtmp.sourceDb='${attached_db_fn}'
       `
@@ -227,6 +238,18 @@ async function search_db (event, filename_filter, contents_filter, path_filter, 
 
 }
 
+function agnosticFilepathToLocal(pathroot, subdirs) {
+  return path.join(pathroot, ...subdirs.split(':'));
+}
+
+function getFolderPath (filePath, fldPath) {
+  if (filePath.substring(3).includes(":")) {
+    return agnosticFilepathToLocal(fldPath, filePath);
+  } else {
+    return filePath;
+  }
+}
+
 async function eventPassback (event, eventName, selectedRow) {
   //const webContents = event.sender
   //const win = BrowserWindow.fromWebContents(webContents)
@@ -235,7 +258,8 @@ async function eventPassback (event, eventName, selectedRow) {
   console.log(selectedRow);
   if (eventName=='OpenFolder') {
     //console.log(selectedRow.get('Path'));
-    let filepath = path.join(selectedRow.get('Path'), selectedRow.get('Filename'));
+    let folderpath = getFolderPath(selectedRow.get('Path'), selectedRow.get('Fld Path'));
+    let filepath = path.join(folderpath, selectedRow.get('Filename'));
 		if (process.platform == 'win32') {
 			let args = ["/select,",filepath]
       child("explorer.exe", args, function(err, data) {
@@ -258,15 +282,17 @@ async function eventPassback (event, eventName, selectedRow) {
     clipboard.clear();
     clipboard.writeText(selectedRow.get('Filename'));
   } else if (eventName == "CopyFullPath") {
-    let filepath = path.join(selectedRow.get('Path'), selectedRow.get('Filename'));
+    let folderpath = getFolderPath(selectedRow.get('Path'), selectedRow.get('Fld Path'));
+    let filepath = path.join(folderpath, selectedRow.get('Filename'));
     clipboard.clear();
     clipboard.writeText(filepath);
   } else if (eventName == "CopyTFSPath") {
+    let folder = selectedRow.get('Folder');
     let folderpath = selectedRow.get('Path');
-		if (folderpath.toLowerCase().startsWith("c:\\tfs")) {
+		if (folder==="TFS") {
 			// #C:\tfs\FGS\ELIMS-FGS  $/FGS/ELIMS-FGS
-			folderpath = folderpath.replaceAll("\\","/");
-			folderpath = '$' + folderpath.slice(6)
+			folderpath = folderpath.replaceAll(":","/");
+			folderpath = '$/' + folderpath
       clipboard.clear();
       clipboard.writeText(folderpath);
     }
@@ -274,7 +300,8 @@ async function eventPassback (event, eventName, selectedRow) {
     let filename = selectedRow.get('Filename')
     //if a zipped archive, try open the file inside the zip
     let file_extension = path.extname(filename)
-    let filepath = path.join(selectedRow.get('Path'), filename);
+    let folderpath = getFolderPath(selectedRow.get('Path'), selectedRow.get('Fld Path'));
+    let filepath = path.join(folderpath, filename);
     let archivePath = selectedRow.get('Archive Path')
     if (archivePath!='' && file_extension=='.7z' && process.platform == 'win32') {
       //TODO extract also for linux
@@ -347,7 +374,8 @@ const createWindow = () => {
 
 
   ipcMain.on('ondragstart', (event, selectedRow) => {
-    let filepath = path.join(selectedRow.get('Path'), selectedRow.get('Filename'));
+    let folderpath = getFolderPath(selectedRow.get('Path'), selectedRow.get('Fld Path'));
+    let filepath = path.join(folderpath, selectedRow.get('Filename'));
     event.sender.startDrag({
       file: filepath,
       icon: dragIcon,

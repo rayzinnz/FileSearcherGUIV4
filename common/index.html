@@ -19,12 +19,18 @@
 
   <body>
     <div class="input_collection"><label class="input_label" for="filename">filename:</label><input type="text" id="filename" autofocus><br></div>
-    <div class="input_collection"><label class="input_label" for="contents">contents:</label><input type="text" id="contents" ><br></div>
+    <div class="input_collection">
+      <label class="input_label" for="contents">contents:</label>
+      <input type="text" id="contents">
+      <label for="contents_checkbox">Exact Match</label>
+      <input type="checkbox" id="contents_checkbox">
+      <br>
+    </div>
     <div class="input_collection"><label class="input_label" for="path">path:</label><input type="text" id="path" ><br></div>
     <div class="input_collection"><label class="input_label" for="row_limit">row_limit:</label><input type="number" id="row_limit" value="30"><br></div>
     <label id="lblLoading"> </label>
     <table id="tblData" draggable="true">
-      <th>Row</th><th>Filename</th><th>Modified</th><th>Size</th><th>Path</th><th>Archive Path</th><th>Folder</th><th>Snip</th>
+      <th>Row</th><th>Filename</th><th>Modified</th><th>Size</th><th>Path</th><th>Archive Path</th><th>Folder</th><th>Fld Path</th><th>Snip</th>
     </table><br>
     <!-- <input type="button" id="tst" value="OK" /> -->
   </body>
