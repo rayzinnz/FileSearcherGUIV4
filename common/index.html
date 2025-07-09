@@ -1,42 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <link rel="stylesheet" href="styles.css">
-    <title>File Searcher V4</title>
-  </head>
 
-  <script src="jquery-3.6.4.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <link rel="stylesheet" href="styles.css">
+  <title>File Searcher V4</title>
+</head>
 
-  <body>
-    <div class="input_collection"><label class="input_label" for="filename">filename:</label><input type="text" id="filename" autofocus><br></div>
+<script src="jquery-3.6.4.min.js"></script>
+
+
+<body>
+  <div id="controlPanel">
+    <div class="input_collection">
+      <label class="input_label" for="filename">filename:</label>
+      <input type="text" id="filename" autofocus />
+    </div>
+
     <div class="input_collection">
       <label class="input_label" for="contents">contents:</label>
-      <input type="text" id="contents">
-      <label for="contents_checkbox">Exact Match</label>
-      <input type="checkbox" id="contents_checkbox">
-      <br>
+      <div class="inline_inputs">
+        <input type="text" id="contents" />
+        <label class="checkbox_label" for="contents_checkbox">
+          <input type="checkbox" id="contents_checkbox" />
+          Exact Match
+        </label>
+      </div>
     </div>
-    <div class="input_collection"><label class="input_label" for="path">path:</label><input type="text" id="path" ><br></div>
-    <div class="input_collection"><label class="input_label" for="row_limit">row_limit:</label><input type="number" id="row_limit" value="30"><br></div>
-    <label id="lblLoading"> </label>
-    <table id="tblData" draggable="true">
-      <th>Row</th><th>Filename</th><th>Modified</th><th>Size</th><th>Path</th><th>Archive Path</th><th>Folder</th><th>Fld Path</th><th>Snip</th>
-    </table><br>
-    <!-- <input type="button" id="tst" value="OK" /> -->
-  </body>
 
-  <!-- put scripts at bottom so all html and elements exist when they run, so no need for window.onload = function() { -->
-  <script src="SupportClasses.js"></script>
-  <script src="renderer.js"></script>
+    <div class="input_collection">
+      <label class="input_label" for="path">path:</label>
+      <input type="text" id="path" />
+    </div>
+
+    <div class="input_collection">
+      <label class="input_label" for="row_limit">row_limit:</label>
+      <input type="number" id="row_limit" value="30" />
+    </div>
+
+    <label id="lblLoading"> </label>
+  </div>
+
+  <div id="tableContainer">
+    <table id="tblData" draggable="true">
+      <thead>
+        <tr>
+          <th>Row</th>
+          <th>Filename</th>
+          <th>Modified</th>
+          <th>Size</th>
+          <th>Path</th>
+          <th>Archive Path</th>
+          <th>Folder</th>
+          <th>Fld Path</th>
+          <th>Snip</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+<!-- put scripts at bottom so all html and elements exist when they run, so no need for window.onload = function() { -->
+<script src="SupportClasses.js"></script>
+<script src="renderer.js"></script>
 
 </html>
