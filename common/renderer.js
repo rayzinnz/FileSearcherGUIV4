@@ -50,6 +50,33 @@ async function windowKeyUp (event) {
 	let selected = tblData.getElementsByClassName('selected');
 	let statusBar = document.getElementById("lblLoading")
 
+
+	// Ctrl+Number = select
+	// Ctrl+Shift+Number = select and open file
+	if (event.ctrlKey && /^Digit[1-9]$/.test(event.code)) {
+		const index = parseInt(event.code.replace('Digit', ''), 10);
+		if (tblData.rows.length > index) {
+			if (selected.length > 0) selected[0].classList.remove('selected');
+			const newRow = tblData.rows[index];
+			newRow.classList.add('selected');
+			newRow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+			if (event.shiftKey) {
+				// Also trigger OpenFile if Shift is held
+				let headerRow = tblData.rows[0];
+				let selectedRowMap = new Map();
+				for (let icell = 0; icell < headerRow.cells.length; icell++) {
+					selectedRowMap.set(headerRow.cells[icell].innerHTML, newRow.cells[icell].innerHTML);
+				}
+				statusBar.innerHTML = `event OpenFile on ${selectedRowMap.get('Filename')}`;
+				await window.electronAPI.eventPassback("OpenFile", selectedRowMap);
+			}
+		}
+		return;
+	}
+
+
+
 	if (event.ctrlKey && !event.altKey && !event.shiftKey) {
 		// Log.append(`You pressed ${event.key}`);
 		if (event.key == "c") {
@@ -83,6 +110,65 @@ async function windowKeyUp (event) {
 		await window.electronAPI.eventPassback(eventName, selectedRowMap);
 	}
 }
+
+let arrowHoldInterval = null;
+let arrowHoldTimeout = null;
+
+function moveSelection(direction) {
+	const tblData = document.getElementById("tblData");
+	const selected = tblData.getElementsByClassName('selected');
+	let currentRow = selected.length > 0 ? selected[0] : null;
+	let newRow = null;
+
+	if (!currentRow && tblData.rows.length > 1 && direction === 1) {
+		newRow = tblData.rows[1]; // Select the first data row if no selection exists and moving down
+	} else if (currentRow) {
+		const idx = currentRow.rowIndex;
+		if (direction === -1 && idx > 1) {
+			newRow = tblData.rows[idx - 1];
+		} else if (direction === 1 && idx < tblData.rows.length - 1) {
+			newRow = tblData.rows[idx + 1];
+		}
+	}
+
+	if (newRow) {
+		if (currentRow) currentRow.classList.remove("selected");
+		newRow.classList.add("selected");
+		newRow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+	}
+}
+
+window.addEventListener("keydown", (event) => {
+	if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+
+	// Only blur if the focused element is specifically #row_limit
+	const activeEl = document.activeElement;
+	if (activeEl && activeEl.id === "row_limit") {
+		activeEl.blur();
+		event.preventDefault(); // Prevent number spinner from changing
+	}
+
+	// Avoid stacking intervals
+	if (arrowHoldInterval || arrowHoldTimeout) return;
+
+	const direction = event.key === "ArrowUp" ? -1 : 1;
+	moveSelection(direction); // immediate move
+
+	arrowHoldTimeout = setTimeout(() => {
+		arrowHoldInterval = setInterval(() => moveSelection(direction), 75);
+	}, 300); // delay before fast repeat
+});
+
+
+window.addEventListener("keyup", (event) => {
+	if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+		clearTimeout(arrowHoldTimeout);
+		clearInterval(arrowHoldInterval);
+		arrowHoldTimeout = null;
+		arrowHoldInterval = null;
+	}
+});
+
 
 window.addEventListener('keyup', windowKeyUp, true)
 
@@ -187,4 +273,5 @@ window.dbAPI.handleRows((event, value) => {
 // 	counter.innerText = newValue
 // 	event.sender.send('counter-value', newValue)
 // })
+
 
