@@ -243,10 +243,10 @@ function agnosticFilepathToLocal(pathroot, subdirs) {
 }
 
 function getFolderPath (filePath, fldPath) {
-  if (filePath.substring(3).includes(":")) {
-    return agnosticFilepathToLocal(fldPath, filePath);
-  } else {
+  if (filePath==='') {
     return filePath;
+  } else {
+    return agnosticFilepathToLocal(fldPath, filePath);
   }
 }
 
