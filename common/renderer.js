@@ -9,11 +9,12 @@
 // }
 
 function highlight(e) {
-	//Log.append('function highlight(e) {')
-	let tblData = document.getElementById("tblData");
-	let selected = tblData.getElementsByClassName('selected');
-    if (selected[0]) selected[0].className = '';
-    e.target.parentNode.className = 'selected';
+	const tblData = document.getElementById("tblData");
+	const selected = tblData.getElementsByClassName('selected');
+	const row = e.target.closest('tr');
+	if (!row || row.rowIndex === 0) return;
+	if (selected[0]) selected[0].classList.remove('selected');
+	row.classList.add('selected');
 }
 
 async function tblDoubleClick(e) {
@@ -60,6 +61,7 @@ async function windowKeyUp (event) {
 			const newRow = tblData.rows[index];
 			newRow.classList.add('selected');
 			newRow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+			scrollToRowWithOffset(newRow);
 
 			if (event.shiftKey) {
 				// Also trigger OpenFile if Shift is held
@@ -134,7 +136,7 @@ function moveSelection(direction) {
 	if (newRow) {
 		if (currentRow) currentRow.classList.remove("selected");
 		newRow.classList.add("selected");
-		newRow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+		scrollToRowWithOffset(newRow);
 	}
 }
 
@@ -168,6 +170,35 @@ window.addEventListener("keyup", (event) => {
 		arrowHoldInterval = null;
 	}
 });
+
+
+
+function scrollToRowWithOffset(row) {
+	const container = document.getElementById("tableContainer");
+	const rect = row.getBoundingClientRect();
+	const containerRect = container.getBoundingClientRect();
+
+	const rowOffset = rect.top - containerRect.top;
+	const headerHeight = document.querySelector("#tblData thead").offsetHeight;
+
+	// Define upper and lower thresholds as percentages of the container height
+	const topThreshold = headerHeight + 20;
+	const bottomThreshold = container.clientHeight - 40;
+
+	if (rowOffset < topThreshold || rowOffset > bottomThreshold) {
+		// Calculate scroll so selected row is roughly centered
+		const scrollTarget = container.scrollTop + rowOffset - container.clientHeight / 2 + rect.height / 2;
+
+		container.scrollTo({
+			top: scrollTarget,
+			behavior: "auto" // or "smooth"
+		});
+	}
+}
+
+
+
+
 
 
 window.addEventListener('keyup', windowKeyUp, true)
